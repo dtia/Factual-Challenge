@@ -11,11 +11,13 @@ import java.util.Set;
 
 public class WinningStrategy implements GuessingStrategy {
 	// ***NOTE: This file path must be modified to point to the words.txt file on your machine***
-	private static String fileName = "/Users/dtia/Development/eclipse workspace/factual challenge/Hangman/src/words.txt";
+	public static String fileName = "/Users/dtia/Development/eclipse workspace/factual challenge/Hangman/src/words.txt";
 	
-	private static char[] VOWELS = {'E', 'A', 'I', 'O',  'U'}; 
+	private static char[] VOWELS = {'E', 'A', 'I', 'O', 'U'}; 
+	
+	// vowels and consonants arranged by letter frequency order
 	private List<Character> vowels = new ArrayList<Character>(Arrays.asList('E', 'A', 'I', 'O', 'U'));
-	private List<Character> consonants = new ArrayList<Character>(Arrays.asList('T', 'N', 'H', 'R', 'S', 'M', 'D', 'L', 'C', 'F', 'G', 'Y', 'P', 'W', 'B', 'V', 'K', 'J', 'X', 'Z', 'Q'));
+	private List<Character> consonants = new ArrayList<Character>(Arrays.asList('T', 'N', 'S', 'H', 'R', 'M', 'D', 'L', 'C', 'F', 'G', 'Y', 'P', 'W', 'B', 'V', 'K', 'J', 'X', 'Z', 'Q'));
 	
 	private HashMap<Integer, List<String>> dict = new HashMap<Integer, List<String>>();
 	private List<String> sameLengths = new ArrayList<String>();
@@ -24,6 +26,7 @@ public class WinningStrategy implements GuessingStrategy {
 		loadDictionary();
 	}
 	
+
 	/*
 	 * Read text file into dictionary
 	 */
@@ -64,7 +67,7 @@ public class WinningStrategy implements GuessingStrategy {
 		
 		if (PlayHangman.DEBUG) {
 			System.out.println("filtered words size: " + sameLengths.size());		
-			//System.out.println("filtered words words: " + sameLengths);
+			System.out.println("filtered words: " + sameLengths);
 		}
 				
 		// guess random word if there are 4 or less possibilities
@@ -85,6 +88,14 @@ public class WinningStrategy implements GuessingStrategy {
 			if (!game.getAllGuessedLetters().contains(new Character('R'))) {
 				consonants.remove(new Character('R'));
 				return new GuessLetter('R');
+			}
+		}
+		// add a G if the word is ___IN_ for words like "RUNNING"
+		else if (game.getGuessedSoFar().contains("IN" + HangmanGame.MYSTERY_LETTER) && 
+				game.getGuessedSoFar().charAt(game.getSecretWordLength()-1) == HangmanGame.MYSTERY_LETTER) {
+			if (!game.getAllGuessedLetters().contains(new Character('G'))) {
+				consonants.remove(new Character('G'));
+				return new GuessLetter('G');
 			}
 		}
 		// consider whether another vowel should be added
@@ -193,6 +204,5 @@ public class WinningStrategy implements GuessingStrategy {
 			}
 		}		
 		return true;
-	}
-
+	}	
 }

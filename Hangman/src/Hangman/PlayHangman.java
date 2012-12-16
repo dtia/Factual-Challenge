@@ -8,30 +8,44 @@ public class PlayHangman {
 	public static boolean DEBUG = false;
 	
 	/**
-	 * @param args
-	 * @throws IOException 
+	 * Play hangman for each of the words in the array 
 	 */
 	public static void main(String[] args) throws IOException {
 		String[] words = {"comaker", "monadism", "cumulate", "eruptive", "factual", "mus", "nagging", 
 				"oses", "remembered", "spodumenes", "stereoisomers", "toxics", "trichromats", "triose", "uniformed"};
-				
-		System.out.println(playWords(words));
+		
+		System.out.println("Playing hangman...");
+		
+		HashMap<String,Integer> scores = playWords(words);
+		System.out.println(scores);
+		System.out.println("Average score: " + calcAverageScore(scores));
 	}
 	
 	/*
 	 * Play a new game of hangman for each of the words in the words array
+	 * Output a map of word to score
 	 */
-	private static HashMap<String,Integer> playWords(String[] words) throws IOException {
+	public static HashMap<String,Integer> playWords(String[] words) throws IOException {
 		HashMap<String,Integer> wordScores = new HashMap<String,Integer>();
 		
 		for(int i=0; i<words.length; i++) {
-			HangmanGame game = new HangmanGame(words[i], 8);
+			HangmanGame game = new HangmanGame(words[i], 5);
 			GuessingStrategy strat = new WinningStrategy();
 			wordScores.put(words[i].toUpperCase(), run(game, strat));
-			System.out.println();
+			if(DEBUG)
+				System.out.println();
 		}
 		
 		return wordScores;
+	}
+	
+	private static float calcAverageScore(HashMap<String,Integer> scores) {
+		int sum = 0;
+		int numVals = scores.keySet().size();
+		for(int score : scores.values()) {
+			sum += score;
+		}		
+		return (float)sum / numVals;
 	}
 	
 	/*
@@ -39,13 +53,15 @@ public class PlayHangman {
 	 */
 	public static int run(HangmanGame game, GuessingStrategy strategy) {
 	  while(game.gameStatus() == Status.KEEP_GUESSING) {
-		  System.out.println(game);
+		  if(DEBUG)
+			  System.out.println(game);
 		  Guess nextGuess = strategy.nextGuess(game);
 		  if(DEBUG)
 			  System.out.println(nextGuess);
 		  nextGuess.makeGuess(game);
 	  }
-	  System.out.println(game);
+	  if(DEBUG)
+		  System.out.println(game);
 	  return game.currentScore();
 	}
 }
